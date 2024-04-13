@@ -11,6 +11,10 @@ class Lexico:
     self.numero_da_linha = 1
     self.simbolos_especiais = ['(', ')', '{', '}', ',', ';', ':',
                                 '!', '=', '+', '-', '*', '@']
+    self.palavras_reservadas = [
+      'if', 'then', 'else', 'while', 'do', 'until', 'repeat', 'int', 'double',
+      'char', 'case', 'switch', 'end', 'procedure', 'function', 'for', 'begin'
+    ]
     self.possuiErroLexico = False
 
     #Ler o arquivo
@@ -37,6 +41,7 @@ class Lexico:
       else:
           self.lexico += caractere
           self.automato(caractere)
+      #print(self.lexico)
       self.index_next()
       
   #Estados
@@ -47,28 +52,49 @@ class Lexico:
     else:
       self.possuiErroLexico = True
       
-
   def q1(self, caractere):
     if caractere.isalpha() or caractere.isdigit():
       self.estado_atual = 'q1'
-    elif '_':
+    elif caractere == '_':
       self.estado_atual = 'q2'
+    elif caractere == '.':
+      self.estado_atual = 'q4'
+    elif caractere.isalpha():
+      self.estado_atual = 'q6'
     else :
       self.possuiErroLexico = True
 
   def q2(self, caractere):
-    if caractere.isalpha():
-      self.estado_atual = 'q2'
+    if caractere.isalpha() or caractere.isdigit():
+      self.estado_atual = 'q3'
       return
     else:
       self.possuiErroLexico = True
 
   def q3(self, caractere):
       if caractere.isalpha() or caractere.isdigit():
-        self.estado_atual = 'q2'
+        self.estado_atual = 'q3'
       else:
         self.possuiErroLexico = True
+  
+  def q4(self, caractere):
+    if caractere.isalpha() or caractere.isdigit():
+      self.estado_atual = 'q5'
+    else:
+      self.possuiErroLexico = True
 
+  def q5(self, caractere):
+    if caractere.isalpha() or caractere.isdigit():
+      self.estado_atual = 'q5'
+    else:
+      self.possuiErroLexico = True
+
+  def q6(self, caractere):
+    if caractere.isalpha():
+      self.estado_atual = 'q6'
+    else:
+      self.possuiErroLexico = True
+      
   #Verifica o tipo de estado 
   def automato(self, caractere):
     match self.estado_atual:
@@ -81,17 +107,33 @@ class Lexico:
       case 'q2':
         self.q2(caractere)
         return
+      case 'q3':
+        self.q3(caractere)
+        return
+      case 'q4':
+        self.q4(caractere)
+        return
+      case 'q5':
+        self.q5(caractere)
+        return
+      case 'q6':
+        self.q6(caractere)
+        return
       case _:
         self.possuiErroLexico = True
 
+  #Classifica o tipo do token
   def classifica_token(self, estado):
     if not self.possuiErroLexico and self.lexico != '':
       if estado in self.estados_finais:
-        print(f'{self.lexico} => IDENTIFICADOR')
+        if self.lexico in self.palavras_reservadas:
+          print(f'{self.lexico} => PALAVRA RESERVADA')
+        else:
+          print(f'{self.lexico} => IDENTIFICADOR')
     else:
       if self.lexico != '':
         print(f'{self.lexico} => NÃO RECONHECIDO')
-      #self.possuiErroLexico = False
+        self.possuiErroLexico = False
       
   def main(self):
     self.obter_caractere()
