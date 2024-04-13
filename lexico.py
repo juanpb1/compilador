@@ -6,7 +6,7 @@ class Lexico:
     self.lexico = ''
     self.estado_atual = 'q0'
     self.estado_inicial = 'q0'
-    self.estados_finais = ['q1', 'q3', 'q5', 'q6', 'q9', 'q11', 'q7',]
+    self.estados_finais = ['q1', 'q3', 'q5', 'q6', 'q8', 'q10',]
     self.current_index = 0
     self.numero_da_linha = 1
     self.simbolos_especiais = ['(', ')', '{', '}', ',', ';', ':',
@@ -38,17 +38,21 @@ class Lexico:
         self.classifica_token(self.estado_atual)
         self.numero_da_linha += 1
         self.lexico = ''
+        self.estado_atual = 'q0'
       else:
           self.lexico += caractere
           self.automato(caractere)
-      #print(self.lexico)
+        
       self.index_next()
       
   #Estados
   def qO(self, caractere):
     if caractere.isalpha():
       self.estado_atual = 'q1'
-      self.q1(caractere)
+    elif caractere == '-':
+      self.estado_atual = 'q7'
+    elif caractere.isdigit():
+      self.estado_atual = 'q8'
     else:
       self.possuiErroLexico = True
       
@@ -94,6 +98,32 @@ class Lexico:
       self.estado_atual = 'q6'
     else:
       self.possuiErroLexico = True
+
+  def q7(self, caractere):
+    if caractere.isdigit():
+      self.estado_atual = 'q8'
+    else:
+      self.possuiErroLexico = True
+
+  def q8(self, caractere):
+    if caractere.isdigit():
+      self.estado_atual = 'q8'
+    elif caractere == '.':
+      self.estado_atual = 'q9'
+    else:
+      self.possuiErroLexico = True
+
+  def q9(self, caractere):
+    if caractere.isdigit():
+      self.estado_atual = 'q10'
+    else:
+      self.possuiErroLexico = True
+
+  def q10(self, caractere):
+    if caractere.isdigit():
+      self.estado_atual = 'q10'
+    else:
+      self.possuiErroLexico = True 
       
   #Verifica o tipo de estado 
   def automato(self, caractere):
@@ -119,6 +149,18 @@ class Lexico:
       case 'q6':
         self.q6(caractere)
         return
+      case 'q7':
+        self.q7(caractere)
+        return
+      case 'q8':
+        self.q8(caractere)
+        return
+      case 'q9':
+        self.q9(caractere)
+        return
+      case 'q10':
+        self.q10(caractere)
+        return
       case _:
         self.possuiErroLexico = True
 
@@ -128,6 +170,8 @@ class Lexico:
       if estado in self.estados_finais:
         if self.lexico in self.palavras_reservadas:
           print(f'{self.lexico} => PALAVRA RESERVADA')
+        elif estado in ['q8', 'q10']:
+          print(f'{self.lexico} => DÍGITO')
         else:
           print(f'{self.lexico} => IDENTIFICADOR')
     else:
