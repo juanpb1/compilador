@@ -13,6 +13,7 @@ class Lexico:
       ';', ',', ' .', '+', '-', '*', '(', ')', '{',
       '}', '/', '@', '<=', '<>',':=', '>=', '+='
     ]
+    # Reconhecer apenas os símbolos especiais um caractere
     self.palavras_reservadas = [
       'if', 'then', 'else', 'while', 'do', 'until', 'repeat', 'int', 'double',
       'char', 'case', 'switch', 'end', 'procedure', 'function', 'for', 'begin'
@@ -30,14 +31,16 @@ class Lexico:
 
   def index_next(self):
     self.current_index += 1
-    
   
   #Percorre o arquivo
   def obter_caractere(self):
     while(self.index_atual() < self.tamArquivo):
       caractere = self.arquivo[self.index_atual()]
+      
       if(caractere == '\n' or caractere == ' ' or 
-         self.index_atual() == self.tamArquivo):
+         self.index_atual() + 1 >= self.tamArquivo):
+        if(self.index_atual() + 1 >= self.tamArquivo):
+          self.lexico += caractere
         self.classifica_token(self.estado_atual)
         self.numero_da_linha += 1
         self.lexico = ''
@@ -46,8 +49,6 @@ class Lexico:
           self.lexico += caractere
           self.automato(caractere)
         
-      # print(f'estado atual[{self.estado_atual}] => ', end=" ")
-      # print(caractere)
       self.index_next()
       
   #Estados
