@@ -46,8 +46,8 @@ class Lexico:
         self.lexico = ''
         self.estado_atual = 'q0'
       else:
-          self.lexico += caractere
-          self.automato(caractere)
+        self.lexico += caractere
+        self.automato(caractere)
         
       self.index_next()
       
@@ -136,7 +136,13 @@ class Lexico:
       self.estado_atual = 'q10'
     else:
       self.possuiErroLexico = True
-
+      
+  def q11(self, caractere):
+    if (caractere == '='):
+      self.estado_atual = 'q11'
+    else:
+      self.possuiErroLexico = True
+      
   def q12(self, caractere):
     if caractere in ['=', '>'] :
       self.estado_atual = 'q11'
@@ -185,6 +191,9 @@ class Lexico:
       case 'q10':
         self.q10(caractere)
         return
+      case 'q11':
+        self.q11(caractere)
+        return
       case 'q12':
         self.q12(caractere)
         return
@@ -207,7 +216,7 @@ class Lexico:
           print(f'{self.lexico} => IDENTIFICADOR')
     else:
       if self.lexico != '':
-        print(f'{self.lexico} => NÃO RECONHECIDO')
+        print(f'ERRO LÉXICO NA LINHA {self.numero_da_linha } - {self.lexico} => NÃO RECONHECIDO')
         self.possuiErroLexico = False
       
   def main(self):
