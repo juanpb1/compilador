@@ -1,5 +1,2 @@
-i>>____f   else 
-   teste
-   -32.2 433 ( <> 4343 + += -2 - { } +++++++
-434 dsds ; cx
-aa_a11.1    gffgf
+5 i*soma
+
