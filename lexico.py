@@ -34,6 +34,12 @@ class Lexico:
   def reset_token(self):
     self.index_back()
     self.token = self.token[:-1]
+
+  def isComentario(self):
+    if(self.estado_atual != 'q15' and self.estado_atual != 'q16'):
+      return True;
+    else:
+      return False;
   
   #Percorre o arquivo
   def percorre_arquivo(self):
@@ -41,9 +47,9 @@ class Lexico:
       caractere = self.arquivo[self.index_atual()]
       self.token += caractere
       self.automato(caractere)
-      if(caractere == '\n' or 
-         (caractere.isspace() and self.estado_atual != 'q15') or 
-         self.index_atual() + 1 >= self.lenArquivo):
+      if((caractere == '\n' and self.estado_atual != 'q16') or 
+        (caractere.isspace() and self.isComentario()) or
+        self.index_atual() + 1 >= self.lenArquivo):
         self.classifica_token(self.estado_atual)
       
       self.index_next()
@@ -186,6 +192,11 @@ class Lexico:
       self.estado_atual = 'q15'
 
   def q16(self, caractere):
+    if(caractere == '!'):
+      self.estado_atual = 'q17'
+      self.reset_token()
+    else:
+      self.estado_atual = 'q16'
     
   #Verifica o tipo de estado 
   def automato(self, caractere):
@@ -234,6 +245,8 @@ class Lexico:
         self.q14(caractere)
       case 'q15':
         self.q15(caractere)
+      case 'q16':
+        self.q16(caractere)
       case _:
         return
 
