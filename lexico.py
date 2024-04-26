@@ -1,21 +1,16 @@
 class Lexico:
 
-  #  VERIFICAR O TOKEN DENTRO DO ESTADO, SE NÃO PERTENCE A SEQUENCIA, ELE VERIFICA SE O
-  # ESTADO É FINAL E ELE EXIBE O TIPO DO TOKEN
-  
   def __init__(self, arquivo_base):
     #Inicializa as variáveis de instância
     self.arquivo_base = arquivo_base
     self.token = ''
     self.estado_inicial = 'q0'
-    self.estados_finais = ['q1', 'q3', 'q5', 'q8', 'q10', 'q11']
+    self.estados_finais = ['q1', 'q3', 'q5', 'q6', 'q8', 'q10', 'q11', 'q17']
     self.estado_atual = self.estado_inicial
     self.current_index = 0
     self.numero_da_linha = 1
     self.simbolos_especiais = [
-      ';', ',', '.', '+', '-', '*', '(', ')', '{',
-      '}', '/', '@', ]
-    # Reconhecer apenas os símbolos especiais um caractere
+      ';', ',', '.', '+', '-', '*', '(', ')', '{','}', '/', '@', ]
     self.palavras_reservadas = [
       'if', 'then', 'else', 'while', 'do', 'until', 'repeat', 'int', 'double',
       'char', 'case', 'switch', 'end', 'procedure', 'function', 'for', 'begin'
@@ -44,15 +39,12 @@ class Lexico:
   def percorre_arquivo(self):
     while(self.index_atual() < self.lenArquivo):
       caractere = self.arquivo[self.index_atual()]
-      if(caractere == '\n' or caractere == ' ' or 
+      self.token += caractere
+      self.automato(caractere)
+      if(caractere == '\n' or 
+         (caractere.isspace() and self.estado_atual != 'q15') or 
          self.index_atual() + 1 >= self.lenArquivo):
-        if(self.index_atual() + 1 >= self.lenArquivo):
-          self.token += caractere
-          self.automato(caractere)
         self.classifica_token(self.estado_atual)
-      else:
-        self.token += caractere
-        self.automato(caractere)
       
       self.index_next()
       
@@ -70,16 +62,18 @@ class Lexico:
       self.estado_atual = 'q13'
     elif caractere in self.simbolos_especiais:
       self.estado_atual = 'q11'
+    elif caractere == '!':
+      self.estado_atual = 'q14'
     else:
       self.classifica_token(self.estado_atual)
       
   def q1(self, caractere):
-    if caractere.isalpha() or caractere.isdigit():
-      self.estado_atual = 'q1'
-    elif caractere == '_':
+    if caractere == '_':
       self.estado_atual = 'q2'
     elif caractere == '.':
       self.estado_atual = 'q4'
+    elif caractere.isalpha():
+      self.estado_atual = 'q6'
     else:
       self.reset_token()
       self.classifica_token(self.estado_atual)
@@ -94,6 +88,8 @@ class Lexico:
   def q3(self, caractere):
     if caractere.isalpha() or caractere.isdigit():
       self.estado_atual = 'q3'
+    elif caractere == '_':
+      self.estado_atual = 'q2'
     else:
       self.reset_token()
       self.classifica_token(self.estado_atual)
@@ -101,6 +97,8 @@ class Lexico:
   def q4(self, caractere):
     if caractere.isalpha() or caractere.isdigit():
       self.estado_atual = 'q5'
+    elif caractere == '.':
+      self.estado_atual = 'q4'
     else:
       self.reset_token()
       self.classifica_token(self.estado_atual)
@@ -111,7 +109,14 @@ class Lexico:
     else:
       self.reset_token()
       self.classifica_token(self.estado_atual)
-
+  
+  def q6(self, caractere):
+    if caractere.isalpha() or caractere.isdigit():
+      self.estado_atual = 'q6'
+    else:
+      self.reset_token()
+      self.classifica_token(self.estado_atual)
+  
   def q7(self, caractere):
     if caractere.isdigit():
       self.estado_atual = 'q8'
@@ -162,7 +167,26 @@ class Lexico:
     else:
       self.reset_token()
       self.classifica_token(self.estado_atual)
-      
+
+  def q14(self, caractere):
+    if(caractere == '!'):
+      self.estado_atual = 'q15'
+    elif (caractere.isalpha() or caractere.isdigit() or caractere == ' '):
+      self.estado_atual = 'q16'
+    else: 
+      self.reset_token()
+      self.classifica_token(self.estado_atual)
+
+  def q15(self, caractere):
+    if caractere == '\n' or self.index_atual() + 2 >= self.lenArquivo:
+      self.estado_atual = 'q17'
+      self.reset_token()
+      #self.classifica_token(self.estado_atual)
+    else: 
+      self.estado_atual = 'q15'
+
+  def q16(self, caractere):
+    
   #Verifica o tipo de estado 
   def automato(self, caractere):
     match self.estado_atual:
@@ -184,6 +208,9 @@ class Lexico:
       case 'q5':
         self.q5(caractere)
         return
+      case 'q6':
+        self.q6(caractere)
+        return
       case 'q7':
         self.q7(caractere)
         return
@@ -203,6 +230,10 @@ class Lexico:
         self.q12(caractere)
       case 'q13':
         self.q13(caractere)
+      case 'q14':
+        self.q14(caractere)
+      case 'q15':
+        self.q15(caractere)
       case _:
         return
 
@@ -210,19 +241,21 @@ class Lexico:
   def classifica_token(self, estado):
     if(estado in self.estados_finais):
       match estado:
-        case 'q1' | 'q3' | 'q5':
+        case 'q1' | 'q3' | 'q5'| 'q6':
           if(self.token.strip(' ') in self.palavras_reservadas):
             print(f'{self.token} => PALAVRA RESERVADA.')
-          else:
+          else: 
             print(f'{self.token} => IDENTIFICADOR.')
         case 'q8' | 'q10':
-            print(f'{self.token} => DÍGITO.')
+          print(f'{self.token} => DÍGITO.')
         case 'q11':
           print(f'{self.token} => SÍMBOLO ESPECIAL.')
+        case 'q17':
+         print(f'{self.token} => COMENTÁRIO.')
         case _:
           print(f'ERRO LÉXICO {estado}.')
     else:
-      if(self.token != '\n' and self.token != ""):
+      if(self.token != '\n' and self.token and not self.token.isspace()):
         print(f'{self.token} => NÃO RECONHECIDO no ESTADO {estado}.')
 
     self.token = ''
