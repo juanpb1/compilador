@@ -9,7 +9,7 @@ class Lexico:
     self.estados_finais = ['q1', 'q3', 'q5', 'q6', 'q8', 'q10', 'q11', 'q17']
     self.estado_atual = self.estado_inicial
     self.current_index = 0
-    self.numero_da_linha = 1
+    self.numero_da_linha = 0
     self.simbolos_especiais = [
       ';', ',', '.', '+', '-', '*', '(', ')', '{','}', '/', '@', ]
     self.palavras_reservadas = [
@@ -41,6 +41,10 @@ class Lexico:
       return True;
     else:
       return False;
+
+  def pula_linha(self, caractere):
+    if(caractere == '\n'):
+      self.numero_da_linha += 1
   
   #Percorre o arquivo
   def percorre_arquivo(self):
@@ -53,6 +57,7 @@ class Lexico:
         self.index_atual() + 1 >= self.lenArquivo):
         self.classifica_token(self.estado_atual)
       
+      self.pula_linha(caractere)
       self.index_next()
       
   #Estados
@@ -285,6 +290,7 @@ class Lexico:
       if(self.token != '\n' and self.token and not self.token.isspace()):
         token['token'] = self.token
         token['classe'] = 'ERRO'
+        token['linha'] = self.numero_da_linha
         self.tokens.append(token)
 
     self.token = ''
