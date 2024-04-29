@@ -1,5 +1,6 @@
-from lexico import Lexico
 from tabulate import tabulate
+
+from lexico import Lexico
 
 analise_lexica = []
 tabelas_tokens = []
