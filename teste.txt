@@ -1,8 +1,3 @@
-; 5 i*soma 
-@@COMEN TARIO
+;5 i*soma
+54,54 . 
 
-//
-
-testando
-/hghghg
-//

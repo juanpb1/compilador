@@ -4,9 +4,11 @@ class Lexico:
     #Inicializa as variáveis de instância
     self.arquivo_base = arquivo_base
     self.token = ''
-    self.tokens =  []
+    self.erroLexico = False
+    # self.tokens =  []
     self.estado_inicial = 'q0'
-    self.estados_finais = ['q1', 'q3', 'q5', 'q6', 'q8', 'q10', 'q11', 'q17', 'q22', 'q26']
+    self.estados_finais = ['q1', 'q3', 'q5', 'q6', 'q8', 'q10', 'q11', 'q17',
+                           'q22', 'q26']
     self.estado_atual = self.estado_inicial
     self.current_index = 0
     self.numero_da_linha = 1
@@ -46,6 +48,8 @@ class Lexico:
   #Percorre o arquivo
   def percorre_arquivo(self):
     while(self.index_atual() < self.lenArquivo):
+      if(self.erroLexico):
+        break
       caractere = self.arquivo[self.index_atual()]
       self.token += caractere
       self.automato(caractere)
@@ -160,7 +164,7 @@ class Lexico:
 
   def q11(self, caractere):
     if caractere == '@':
-      self.estado_atual = 'q19'
+      self.estado_atual = 'q20'
     elif caractere == '/':
       self.estado_atual = 'q24'
     elif caractere != ' ' or caractere == '\n':
@@ -186,7 +190,8 @@ class Lexico:
   def q14(self, caractere):
     if(caractere == '!'):
       self.estado_atual = 'q15'
-    elif (caractere.isalpha() or caractere.isdigit() or caractere == ' '):
+    elif (caractere.isalpha() or caractere.isdigit() or 
+          caractere == ' ' or caractere == '\n'):
       self.estado_atual = 'q16'
     else: 
       self.reset_token()
@@ -306,44 +311,30 @@ class Lexico:
 
   #Classifica o tipo do token
   def classifica_token(self, estado):
-    token = dict()
     if(estado in self.estados_finais):
       match estado:
         case 'q1' | 'q3' | 'q5'| 'q6':
           if(self.token.strip(' ') in self.palavras_reservadas):
-            token['token'] = self.token
-            token['classe'] = 'PALAVRA RESERVADA'
-            self.tokens.append(token)
+            print(f'Token: {self.token} | Tipo: PALAVRA RESERVADA')
           else:
-            token['token'] = self.token
-            token['classe'] = 'IDENTIFICADOR'
-            self.tokens.append(token)
+            print(f'Token: {self.token} | Tipo: IDENTIFICADOR')
         case 'q8' | 'q10':
-          token['token'] = self.token
-          token['classe'] = 'DÍGITO'
-          self.tokens.append(token)
+            print(f'Token: {self.token} | Tipo: DÍGITO')
         case 'q11':
-          token['token'] = self.token
-          token['classe'] = 'SÍMBOLO ESPECIAL'
-          self.tokens.append(token)
+          print(f'Token: {self.token} | Tipo: SÍMBOLO ESPECIAL')
         case 'q17' | 'q22' | 'q26':
-          token['token'] = self.token
-          token['classe'] = 'COMENTÁRIO'
-          self.tokens.append(token)
+          print(f'Token: {self.token} | Tipo: PALAVRA RESERVADA')
         case _:
-          token['token'] = self.token
-          token['classe'] = 'ERRO'
-          self.tokens.append(token)
+          print(f'ERRO AO TENTAR RECONHECER O Token: {self.token}')
     else:
       if(self.token != '\n' and self.token and not self.token.isspace()):
-        token['token'] = f'{self.token} no ESTADO: {self.estado_atual}'
-        token['classe'] = 'ERRO'
-        token['linha'] = self.numero_da_linha
-        self.tokens.append(token)
+        print(f'\nERRO LÉXICO na Linha {self.numero_da_linha}.')
+        print(f"Token '{self.token}' não reconhecido!")
+        self.erroLexico = True
 
     self.token = ''
     self.estado_atual = self.estado_inicial
   
   def main(self):
     self.percorre_arquivo()
-    return self.tokens
+    # return self.tokens
