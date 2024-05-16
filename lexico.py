@@ -16,7 +16,8 @@ class Lexico:
       ';', ',', '.', '+', '-', '*', '(', ')', '{','}', '/', '@', ]
     self.palavras_reservadas = [
       'if', 'then', 'else', 'while', 'do', 'until', 'repeat', 'int', 'double',
-      'char', 'case', 'switch', 'end', 'procedure', 'function', 'for', 'begin'
+      'char', 'case', 'switch', 'end', 'procedure', 'function', 'for', 'begin',
+      'boolean', 'type', 'var'
     ]
 
     #Ler o arquivo
@@ -142,7 +143,7 @@ class Lexico:
   def q8(self, caractere):
     if caractere.isdigit():
       self.estado_atual = 'q8'
-    elif caractere == ',':
+    elif caractere == '.':
       self.estado_atual = 'q9'
     else:
       self.reset_token()
