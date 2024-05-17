@@ -1,3 +1,24 @@
 ;5 i*soma
-54,54 . 
+u_teste123ab
 
+@@hhz_nota
+
+boolean
+5.55
+@@ Comentário de uma linha
+
+// 
+comentário 
+de
+varias
+linhas
+//
+
+!! comentário de uma linha
+
+!
+comentário 
+de 
+varias
+linhas
+!
