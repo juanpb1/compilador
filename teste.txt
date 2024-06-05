@@ -1,24 +1,22 @@
-;5 i*soma
-u_teste123ab
+a_bbc
 
 @@hhz_nota
 
-boolean
-5.55
-@@ Comentário de uma linha
+boolean type var
 
-// 
-comentário 
-de
-varias
-linhas
-//
+{ }
 
-!! comentário de uma linha
+//comentario
+de varias
+linhas //
 
-!
-comentário 
-de 
-varias
-linhas
-!
+2 -2 --2 65.78
+
+!! comentario de uma linha
+
+!comentario 
+de varias
+linhas!
+
+
+
