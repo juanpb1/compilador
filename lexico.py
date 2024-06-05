@@ -5,7 +5,6 @@ class Lexico:
     self.arquivo_base = arquivo_base
     self.token = ''
     self.erroLexico = False
-    # self.tokens =  []
     self.estado_inicial = 'q0'
     self.estados_finais = ['q1', 'q3', 'q5', 'q6', 'q8', 'q10', 'q11', 'q17',
                            'q22', 'q26']
@@ -65,11 +64,11 @@ class Lexico:
       self.index_next()
       
   #Estados
-  def qO(self, caractere):
+  def q0(self, caractere):
     if caractere.isalpha():
       self.estado_atual = 'q1'
-    elif caractere == '-':
-      self.estado_atual = 'q7'
+    # elif caractere == '-':
+    #   self.estado_atual = 'q7'
     elif caractere.isdigit():
       self.estado_atual = 'q8'
     elif caractere == '<':
@@ -132,7 +131,7 @@ class Lexico:
     if caractere.isalpha() or caractere.isdigit():
       self.estado_atual = 'q6'
     else:
-      #self.reset_token()
+      self.reset_token(caractere)
       self.classifica_token(self.estado_atual)
   
   def q7(self, caractere):
@@ -170,6 +169,8 @@ class Lexico:
       self.estado_atual = 'q20'
     elif caractere == '/':
       self.estado_atual = 'q24'
+    elif caractere.isdigit():
+      self.estado_atual = 'q8'
     elif caractere != ' ' or caractere == '\n':
       self.reset_token(caractere)
       self.classifica_token(self.estado_atual)
@@ -252,65 +253,34 @@ class Lexico:
   
   #Verifica o tipo de estado 
   def automato(self, caractere):
-    match self.estado_atual:
-      case 'q0':
-        self.qO(caractere) 
-        return
-      case 'q1':
-        self.q1(caractere)
-        return
-      case 'q2':
-        self.q2(caractere)
-        return
-      case 'q3':
-        self.q3(caractere)
-        return
-      case 'q4':
-        self.q4(caractere)
-        return
-      case 'q5':
-        self.q5(caractere)
-        return
-      case 'q6':
-        self.q6(caractere)
-        return
-      case 'q7':
-        self.q7(caractere)
-        return
-      case 'q8':
-        self.q8(caractere)
-        return
-      case 'q9':
-        self.q9(caractere)
-        return
-      case 'q10':
-        self.q10(caractere)
-        return
-      case 'q11':
-        self.q11(caractere)
-        return
-      case 'q12':
-        self.q12(caractere)
-      case 'q13':
-        self.q13(caractere)
-      case 'q14':
-        self.q14(caractere)
-      case 'q15':
-        self.q15(caractere)
-      case 'q16':
-        self.q16(caractere)
-      case 'q19':
-        self.q19(caractere)
-      case 'q20':
-        self.q20(caractere)
-      case 'q21':
-        self.q21(caractere)
-      case 'q24':
-        self.q24(caractere)
-      case 'q25':
-        self.q25(caractere)
-      case _:
-        return
+    state_actions = {
+      'q0': self.q0,
+      'q1': self.q1,
+      'q2': self.q2,
+      'q3': self.q3,
+      'q4': self.q4,
+      'q5': self.q5,
+      'q6': self.q6,
+      'q7': self.q7,
+      'q8': self.q8,
+      'q9': self.q9,
+      'q10': self.q10,
+      'q11': self.q11,
+      'q12': self.q12,
+      'q13': self.q13,
+      'q14': self.q14,
+      'q15': self.q15,
+      'q16': self.q16,
+      'q19': self.q19,
+      'q20': self.q20,
+      'q21': self.q21,
+      'q24': self.q24,
+      'q25': self.q25,
+    }
+
+    action = state_actions.get(self.estado_atual)
+    if action:
+        action(caractere)
 
   #Classifica o tipo do token
   def classifica_token(self, estado):
@@ -331,7 +301,7 @@ class Lexico:
           print(f'ERRO AO TENTAR RECONHECER O Token: {self.token}\n')
     else:
       if(self.token != '\n' and self.token and not self.token.isspace()):
-        print(f"\nERRO LÉXICO")
+        print("\nERRO LÉXICO")
         print(f"Token '{self.token}' não reconhecido!")
         self.erroLexico = True
 
@@ -340,4 +310,3 @@ class Lexico:
   
   def main(self):
     self.percorre_arquivo()
-    # return self.tokens
