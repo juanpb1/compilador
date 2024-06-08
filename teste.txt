@@ -1,4 +1,5 @@
-a_bbc
+;5 i*soma
+a_bb_bc
 
 @@hhz_nota
 
@@ -8,7 +9,7 @@ boolean type var
 
 //comentario
 de varias
-linhas //
+linhas
 
 2 -2 --2 65.78
 
@@ -17,6 +18,4 @@ linhas //
 !comentario 
 de varias
 linhas!
-
-
-
+//
