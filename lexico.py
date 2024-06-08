@@ -169,7 +169,7 @@ class Lexico:
       self.estado_atual = 'q20'
     elif caractere == '/':
       self.estado_atual = 'q24'
-    elif caractere.isdigit():
+    elif self.token[0] == '-' and caractere.isdigit():
       self.estado_atual = 'q8'
     elif caractere != ' ' or caractere == '\n':
       self.reset_token(caractere)
@@ -282,6 +282,9 @@ class Lexico:
     if action:
         action(caractere)
 
+  def erro(self):
+    raise Exception(f"'{self.token}' não reconhecido")
+  
   #Classifica o tipo do token
   def classifica_token(self, estado):
     if(estado in self.estados_finais):
@@ -301,6 +304,7 @@ class Lexico:
           print(f'ERRO AO TENTAR RECONHECER O Token: {self.token}\n')
     else:
       if(self.token != '\n' and self.token and not self.token.isspace()):
+        
         print("\nERRO LÉXICO")
         print(f"Token '{self.token}' não reconhecido!")
         self.erroLexico = True
