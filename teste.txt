@@ -1,21 +1,6 @@
-;5 i*soma
-a_bb_bc
+principal teste ;
 
-@@hhz_nota
-
-boolean type var
-
-{ }
-
-//comentario
-de varias
-linhas
-
-2 -2 --2 65.78
-
-!! comentario de uma linha
-
-!comentario 
-de varias
-linhas!
-//
+begin
+  x_2 := 3.5 ;
+  x_2 := y + 1.5 ;
+end
