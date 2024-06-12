@@ -304,7 +304,7 @@ class Lexico:
     if(estado in self.estados_finais):
       match estado:
         case 'q1' | 'q3' | 'q5'| 'q6':
-          if(self.token.strip(' ') in self.palavras_reservadas):
+          if(self.token.strip() in self.palavras_reservadas):
             tipo = 'palavra_reservada'
           else:
             tipo = 'identificador'

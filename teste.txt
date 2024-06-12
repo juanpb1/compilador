@@ -1,5 +1,7 @@
 principal teste ;
 
+type a = int ;
+
 begin
   x_2 := 3.5 ;
   x_2 := y + 1.5 ;
