@@ -6,12 +6,12 @@ class Sintatico:
     self.tokens = self.lexico.obter_proximo_token()
     self.token = ''
     self.classe = ''
-
+    self.erroSintatico = False
   
   def erro(self, erro):
+    self.erroSintatico = True
     raise SyntaxError(f'{erro}')
 
-  
   def obter_proximo_token(self):
     try:
       token, classe = next(self.tokens)
@@ -21,7 +21,6 @@ class Sintatico:
     except StopIteration:
       pass
 
-  
   # PROGRAMAS E BLOCOS
   def analisar(self):
     
@@ -225,9 +224,11 @@ class Sintatico:
     if(self.token.strip() != 'end'):
       self.erro('end esperado!')
 
+    if not (self.erroSintatico):
+      print('Análise sintática concluída com sucesso!')
+    
 
   def comando_sem_rotulo(self):
-    print(self.token)
     if self.classe == "identificador":
       self.obter_proximo_token()
       if self.token.strip() == ":=":
