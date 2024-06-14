@@ -17,7 +17,7 @@ class Sintatico:
       token, classe = next(self.tokens)
       self.token = token
       self.classe = classe
-      print(f'{token} - {classe}')
+      #print(f'{token} - {classe}')
     except StopIteration:
       pass
 

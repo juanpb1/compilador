@@ -80,12 +80,13 @@ class Lexico:
       self.estado_atual = 'q12'
     elif caractere in [':', '>', '+']:
       self.estado_atual = 'q13'
+    elif caractere in self.simbolos_especiais:
+      self.estado_atual = 'q11'
     elif caractere == '!':
       self.estado_atual = 'q14'
     elif caractere == '/':
       self.estado_atual = 'q23'
-    elif caractere in self.simbolos_especiais:
-      self.estado_atual = 'q11'
+    
     else:
       return self.classifica_token(self.estado_atual)
     return None
@@ -236,7 +237,7 @@ class Lexico:
   def q16(self, caractere):
     if(caractere == '!'):
       self.estado_atual = 'q17'
-      self.reset_token(caractere)
+      #self.reset_token(caractere)
       return self.classifica_token(self.estado_atual)
     else:
       self.estado_atual = 'q16'
@@ -276,7 +277,7 @@ class Lexico:
   def q25(self, caractere):
     if(caractere == '/'):
       self.estado_atual = 'q26'
-      self.reset_token(caractere)
+      #self.reset_token(caractere)
       return self.classifica_token(self.estado_atual)
     else:
       self.estado_atual = 'q24'
