@@ -13,7 +13,7 @@ class Lexico:
     self.current_index = 0
     self.numero_da_linha = 1
     self.simbolos_especiais = [
-      ';', ',', '.', '+', '-', '*', '(', ')', '{','}', '/', '@',]
+      ';', ',', '.', '+', '-', '*', '(', ')', '{','}', '/', '@','=']
     self.palavras_reservadas = [
       'if', 'then', 'else', 'while', 'do', 'until', 'repeat', 'int', 'double',
       'char', 'case', 'switch', 'end', 'procedure', 'function', 'for', 'begin',
