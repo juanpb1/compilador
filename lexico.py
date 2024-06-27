@@ -3,9 +3,9 @@ class Lexico:
   def __init__(self, arquivo_base):
     #Inicializa as variáveis de instância
     self.arquivo_base = arquivo_base
+    self.caractere = ''
     self.token = ''
     self.erroLexico = False
-    # self.tokens =  []
     self.estado_inicial = 'q0'
     self.estados_finais = ['q1', 'q3', 'q5', 'q6', 'q8', 'q10', 'q11', 'q17',
                            'q22', 'q26']
@@ -13,7 +13,7 @@ class Lexico:
     self.current_index = 0
     self.numero_da_linha = 1
     self.simbolos_especiais = [
-      ';', ',', '.', '+', '-', '*', '(', ')', '{','}', '/', '@', ]
+      ';', ',', '.', '+', '-', '*', '(', ')', '{','}', '/', '@','=']
     self.palavras_reservadas = [
       'if', 'then', 'else', 'while', 'do', 'until', 'repeat', 'int', 'double',
       'char', 'case', 'switch', 'end', 'procedure', 'function', 'for', 'begin',
@@ -41,35 +41,39 @@ class Lexico:
     self.index_back()
     self.token = self.token[:-1]
 
-  def isComentario(self):
-    return self.estado_atual not in {'q15', 'q16', 'q21', 'q24', 'q25'}
-
   def pula_linha(self, caractere):
     if(caractere == '\n'):
       self.numero_da_linha += 1
-  
+
   #Percorre o arquivo
   def percorre_arquivo(self):
-    while(self.index_atual() < self.lenArquivo):
-      if(self.erroLexico):
+    while True:
+      if self.erroLexico:
         break
-      caractere = self.arquivo[self.index_atual()]
-      self.token += caractere
-      self.automato(caractere)
-      if((caractere == '\n' and self.isComentario()) or 
-        (caractere.isspace() and self.isComentario()) or
-        self.index_atual() + 1 >= self.lenArquivo):
-        self.classifica_token(self.estado_atual)
 
-      self.pula_linha(caractere)
+      self.caractere = self.arquivo[self.index_atual()]
+      self.token += self.caractere
+      resultado = self.automato(self.caractere)
+
+      if resultado:
+        token, tipo = resultado
+        yield token, tipo
+
       self.index_next()
       
+      if self.index_atual() >= self.lenArquivo:
+        break
+
+    if self.token:
+      resultado = self.classifica_token(self.estado_atual)
+      if resultado:
+        token, tipo = resultado
+        yield token, tipo
+  
   #Estados
-  def qO(self, caractere):
+  def q0(self, caractere):
     if caractere.isalpha():
       self.estado_atual = 'q1'
-    elif caractere == '-':
-      self.estado_atual = 'q7'
     elif caractere.isdigit():
       self.estado_atual = 'q8'
     elif caractere == '<':
@@ -82,9 +86,11 @@ class Lexico:
       self.estado_atual = 'q14'
     elif caractere == '/':
       self.estado_atual = 'q23'
+    
     else:
-      self.classifica_token(self.estado_atual)
-      
+      return self.classifica_token(self.estado_atual)
+    return None
+  
   def q1(self, caractere):
     if caractere == '_':
       self.estado_atual = 'q2'
@@ -94,15 +100,17 @@ class Lexico:
       self.estado_atual = 'q6'
     else:
       self.reset_token(caractere)
-      self.classifica_token(self.estado_atual)
-
+      return self.classifica_token(self.estado_atual)
+    return None
+      
   def q2(self, caractere):
     if caractere.isalpha() or caractere.isdigit():
       self.estado_atual = 'q3'
     else:
       self.reset_token(caractere)
-      self.classifica_token(self.estado_atual)
-
+      return self.classifica_token(self.estado_atual)
+    return None
+      
   def q3(self, caractere):
     if caractere.isalpha() or caractere.isdigit():
       self.estado_atual = 'q3'
@@ -110,8 +118,9 @@ class Lexico:
       self.estado_atual = 'q2'
     else:
       self.reset_token(caractere)
-      self.classifica_token(self.estado_atual)
-
+      return self.classifica_token(self.estado_atual)
+    return None
+      
   def q4(self, caractere):
     if caractere.isalpha() or caractere.isdigit():
       self.estado_atual = 'q5'
@@ -119,28 +128,32 @@ class Lexico:
       self.estado_atual = 'q4'
     else:
       self.reset_token(caractere)
-      self.classifica_token(self.estado_atual)
-
+      return self.classifica_token(self.estado_atual)
+    return None
+      
   def q5(self, caractere):
     if caractere.isalpha() or caractere.isdigit():
       self.estado_atual = 'q5'
     else:
       self.reset_token(caractere)
-      self.classifica_token(self.estado_atual)
+      return self.classifica_token(self.estado_atual)
+    return None
   
   def q6(self, caractere):
     if caractere.isalpha() or caractere.isdigit():
       self.estado_atual = 'q6'
     else:
-      #self.reset_token()
-      self.classifica_token(self.estado_atual)
+      self.reset_token(caractere)
+      return self.classifica_token(self.estado_atual)
+    return None
   
   def q7(self, caractere):
     if caractere.isdigit():
       self.estado_atual = 'q8'
     else:
       self.reset_token(caractere)
-      self.classifica_token(self.estado_atual)
+      return self.classifica_token(self.estado_atual)
+    return None
       
   def q8(self, caractere):
     if caractere.isdigit():
@@ -149,46 +162,57 @@ class Lexico:
       self.estado_atual = 'q9'
     else:
       self.reset_token(caractere)
-      self.classifica_token(self.estado_atual)
+      return self.classifica_token(self.estado_atual)
+    return None
+      
 
   def q9(self, caractere):
     if caractere.isdigit():
       self.estado_atual = 'q10'
     else:
       self.reset_token(caractere)
-      self.classifica_token(self.estado_atual)
-
+      return self.classifica_token(self.estado_atual)
+    return None
+      
   def q10(self, caractere):
     if caractere.isdigit():
       self.estado_atual = 'q10'
     else:
       self.reset_token(caractere)
-      self.classifica_token(self.estado_atual)
-
+      return self.classifica_token(self.estado_atual)
+    return None
+      
   def q11(self, caractere):
     if caractere == '@':
       self.estado_atual = 'q20'
     elif caractere == '/':
       self.estado_atual = 'q24'
-    elif caractere != ' ' or caractere == '\n':
+    elif self.token[0] == '-' and caractere.isdigit():
+      self.estado_atual = 'q8'
+    elif caractere.isspace() or caractere == '\n':
       self.reset_token(caractere)
-      self.classifica_token(self.estado_atual)
+      return self.classifica_token(self.estado_atual)
     else:
-      self.classifica_token(self.estado_atual)
-  
+      self.reset_token(caractere)
+      return self.classifica_token(self.estado_atual)
+    return None
+      
   def q12(self, caractere):
     if(caractere in ['=', '>']):
       self.estado_atual = 'q11'
     else:
       self.reset_token(caractere)
-      self.classifica_token(self.estado_atual)
+      return self.classifica_token(self.estado_atual)
+    return None
 
   def q13(self, caractere):
     if(caractere == '='):
       self.estado_atual = 'q11'
     else:
       self.reset_token(caractere)
-      self.classifica_token(self.estado_atual)
+      self.estado_atual = 'q11'
+      return self.classifica_token(self.estado_atual)
+    return None
 
   def q14(self, caractere):
     if(caractere == '!'):
@@ -198,44 +222,51 @@ class Lexico:
       self.estado_atual = 'q16'
     else: 
       self.reset_token(caractere)
-      self.classifica_token(self.estado_atual)
+      return self.classifica_token(self.estado_atual)
+    return None
 
   def q15(self, caractere):
     if caractere == '\n' or self.index_atual() + 2 >= self.lenArquivo:
       self.estado_atual = 'q17'
       self.reset_token(caractere)
-      #self.classifica_token(self.estado_atual)
+      return self.classifica_token(self.estado_atual)
     else: 
       self.estado_atual = 'q15'
+    return None
 
   def q16(self, caractere):
     if(caractere == '!'):
       self.estado_atual = 'q17'
-      self.reset_token(caractere)
+      #self.reset_token(caractere)
+      return self.classifica_token(self.estado_atual)
     else:
       self.estado_atual = 'q16'
+    return None
 
   def q19(self, caractere):
     if(caractere.isalpha() or caractere.isdigit() or caractere == ' '):
       self.estado_atual = 'q20'
     else:
       self.reset_token(caractere)
-      self.classifica_token(self.estado_atual)
+      return self.classifica_token(self.estado_atual)
+    return None
 
   def q20(self, caractere):
     if(caractere.isalpha() or caractere.isdigit() or caractere == ' '):
       self.estado_atual = 'q21'
     else:
       self.reset_token(caractere)
-      self.classifica_token(self.estado_atual)
-
+      return self.classifica_token(self.estado_atual)
+    return None
+    
   def q21(self, caractere):
     if caractere == '\n' or self.index_atual() + 2 >= self.lenArquivo:
       self.estado_atual = 'q22'
       self.reset_token(caractere)
-      #self.classifica_token(self.estado_atual)
+      return self.classifica_token(self.estado_atual)
     else: 
       self.estado_atual = 'q21'
+    return None
 
   def q24(self, caractere):
     if(caractere == '/'):
@@ -246,98 +277,96 @@ class Lexico:
   def q25(self, caractere):
     if(caractere == '/'):
       self.estado_atual = 'q26'
-      self.reset_token(caractere)
+      #self.reset_token(caractere)
+      return self.classifica_token(self.estado_atual)
     else:
       self.estado_atual = 'q24'
+    return None
   
   #Verifica o tipo de estado 
   def automato(self, caractere):
     match self.estado_atual:
       case 'q0':
-        self.qO(caractere) 
-        return
+        return self.q0(caractere) 
       case 'q1':
-        self.q1(caractere)
-        return
+        return self.q1(caractere) 
       case 'q2':
-        self.q2(caractere)
-        return
+        return self.q2(caractere)   
       case 'q3':
-        self.q3(caractere)
-        return
+        return self.q3(caractere) 
       case 'q4':
-        self.q4(caractere)
-        return
+        return self.q4(caractere) 
       case 'q5':
-        self.q5(caractere)
-        return
+        return self.q5(caractere) 
       case 'q6':
-        self.q6(caractere)
-        return
+        return self.q6(caractere) 
       case 'q7':
-        self.q7(caractere)
-        return
+        return self.q7(caractere) 
       case 'q8':
-        self.q8(caractere)
-        return
+        return self.q8(caractere) 
       case 'q9':
-        self.q9(caractere)
-        return
+        return self.q9(caractere) 
       case 'q10':
-        self.q10(caractere)
-        return
+        return self.q10(caractere) 
       case 'q11':
-        self.q11(caractere)
-        return
+        return self.q11(caractere) 
       case 'q12':
-        self.q12(caractere)
+        return self.q12(caractere) 
       case 'q13':
-        self.q13(caractere)
+        return self.q13(caractere) 
       case 'q14':
-        self.q14(caractere)
+        return self.q14(caractere) 
       case 'q15':
-        self.q15(caractere)
+        return self.q15(caractere)   
       case 'q16':
-        self.q16(caractere)
+        return self.q16(caractere)     
       case 'q19':
-        self.q19(caractere)
+        return self.q19(caractere) 
       case 'q20':
-        self.q20(caractere)
+        return self.q20(caractere) 
       case 'q21':
-        self.q21(caractere)
+        return self.q21(caractere) 
       case 'q24':
-        self.q24(caractere)
+        self.q24(caractere) 
       case 'q25':
-        self.q25(caractere)
+        return self.q25(caractere) 
       case _:
         return
 
+  def erro(self):
+    raise Exception(f"'{self.token}' não reconhecido")
+  
   #Classifica o tipo do token
   def classifica_token(self, estado):
+    token = self.token
+    tipo = ''
     if(estado in self.estados_finais):
       match estado:
         case 'q1' | 'q3' | 'q5'| 'q6':
-          if(self.token.strip(' ') in self.palavras_reservadas):
-            print(f'Token: {self.token} => Tipo: PALAVRA RESERVADA\n')
+          if(self.token.strip() in self.palavras_reservadas):
+            tipo = 'palavra_reservada'
           else:
-            print(f'Token: {self.token} => Tipo: IDENTIFICADOR\n')
+            tipo = 'identificador'
         case 'q8' | 'q10':
-            print(f'Token: {self.token} => Tipo: DÍGITO\n')
+          tipo = 'dígito'
         case 'q11':
-          print(f'Token: {self.token} => Tipo: SÍMBOLO ESPECIAL\n')
+          tipo = 'símbolo_especial'
         case 'q17' | 'q22' | 'q26':
-          print(f'Token: {self.token} => Tipo: COMENTÁRIO\n')
+          tipo = 'comentario'
         case _:
           print(f'ERRO AO TENTAR RECONHECER O Token: {self.token}\n')
     else:
       if(self.token != '\n' and self.token and not self.token.isspace()):
-        print(f"\nERRO LÉXICO")
+        print("\nERRO LÉXICO")
         print(f"Token '{self.token}' não reconhecido!")
         self.erroLexico = True
-
+        
     self.token = ''
     self.estado_atual = self.estado_inicial
+    return token, tipo
   
-  def main(self):
-    self.percorre_arquivo()
-    # return self.tokens
+  def obter_proximo_token(self):
+    for token, tipo in self.percorre_arquivo():
+      if((token != '' and tipo != '' and tipo != 'comentario')):
+        yield token, tipo
+    #self.percorre_arquivo()
